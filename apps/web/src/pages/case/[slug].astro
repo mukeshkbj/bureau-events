@@ -1,0 +1,30 @@
+---
+import {caseGraphQuery, caseIndexQuery} from '@bureau/content-model/queries'
+import {safeFetch} from '../../lib/safeFetch'
+import Base from '../../layouts/Base.astro'
+import CaseReader from '../../components/CaseReader.astro'
+
+export async function getStaticPaths() {
+  const cases = await safeFetch<{slug?: string}[]>(caseIndexQuery, {}, [])
+  return cases.filter((c) => c.slug).map((c) => ({params: {slug: c.slug}}))
+}
+
+interface GraphDoc {
+  _id: string
+  title: string
+  slug: string
+  docketNumber: string
+  dek?: string
+  premise?: string
+  sigil?: 'orbit' | 'seal' | 'wave'
+  incidents: unknown[]
+}
+
+const {slug} = Astro.params
+const graph = await safeFetch<GraphDoc | null>(caseGraphQuery, {slug}, null)
+if (!graph) return Astro.redirect('/')
+---
+
+<Base title={graph.title} description={graph.dek}>
+  <CaseReader graph={graph} />
+</Base>

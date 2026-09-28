@@ -1,0 +1,26 @@
+{
+  "name": "bureau-of-almost-happened-events",
+  "private": true,
+  "version": "0.1.0",
+  "packageManager": "pnpm@9.15.9",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit -p tsconfig.json && pnpm -r typecheck",
+    "test": "pnpm -r test",
+    "dev:web": "pnpm -F @bureau/web dev",
+    "dev:editor": "pnpm -F @bureau/editor dev",
+    "dev:studio": "pnpm -F @bureau/studio dev",
+    "build": "pnpm -r build",
+    "seed": "pnpm -F @bureau/content-model seed"
+  },
+  "devDependencies": {
+    "@sanity/blueprints": "^0.27.0",
+    "@sanity/functions": "^1.8.0",
+    "@sanity/client": "^8.8.0",
+    "typescript": "^5.9.0",
+    "tsx": "^4.20.0",
+    "vitest": "^3.2.4"
+  }
+}

@@ -1,0 +1,48 @@
+---
+import {caseIndexQuery} from '@bureau/content-model/queries'
+import {safeFetch} from '../lib/safeFetch'
+import Base from '../layouts/Base.astro'
+import Sigil from '../components/Sigil.astro'
+
+interface CaseRow {
+  _id: string
+  title: string
+  slug?: string
+  docketNumber: string
+  dek?: string
+  sigil?: 'orbit' | 'seal' | 'wave'
+  publishedAt?: string
+}
+
+const cases = await safeFetch<CaseRow[]>(caseIndexQuery, {}, [])
+---
+
+<Base title="Dockets" description="An archive of counterfactual incident reports.">
+  <div class="docket-head">
+    <h1>Open dockets</h1>
+    <span class="count">{cases.length} on file</span>
+  </div>
+
+  {
+    cases.length === 0 ? (
+      <div class="empty-state">
+        The archive is empty. No cases have been approved for public release.
+      </div>
+    ) : (
+      <ul class="case-list">
+        {cases.map((c) => (
+          <li>
+            <a class="case-card" href={`/case/${c.slug}`}>
+              <Sigil kind={c.sigil ?? 'seal'} size={56} />
+              <span>
+                <span class="docket">{c.docketNumber}</span>
+                <h2>{c.title}</h2>
+                {c.dek && <p>{c.dek}</p>}
+              </span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    )
+  }
+</Base>

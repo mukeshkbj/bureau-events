@@ -1,0 +1,224 @@
+import {useState} from 'react'
+import {
+  publishDocument,
+  useApplyDocumentActions,
+  useCreateDocument,
+  useDocument,
+  useEditDocument,
+  type DocumentHandle,
+  type SanityDocument,
+} from '@sanity/sdk-react'
+import type {GraphIncident} from '@bureau/content-model/graph'
+
+interface Choice {
+  _key?: string
+  label?: string
+  consequenceNote?: string
+  next?: {_type: 'reference'; _ref: string}
+}
+
+type Doc = SanityDocument & {
+  title?: string
+  incidentCode?: string
+  order?: number
+  report?: string
+  ending?: {isEnding?: boolean; designation?: string; epilogue?: string}
+  choices?: Choice[]
+}
+
+export function IncidentEditor({
+  incidentHandle,
+  caseHandle,
+  siblings,
+  onClose,
+}: {
+  incidentHandle: DocumentHandle
+  caseHandle: DocumentHandle
+  siblings: GraphIncident[]
+  onClose: () => void
+}) {
+  const {data: doc} = useDocument<Doc>({...incidentHandle})
+  const edit = useEditDocument<Doc>({...incidentHandle})
+  const createIncident = useCreateDocument<Doc>({documentType: 'incident'})
+  const apply = useApplyDocumentActions()
+  const [endingOpen, setEndingOpen] = useState(false)
+
+  const set = (patch: Partial<Doc>) => edit((prev: Doc) => ({...prev, ...patch}))
+
+  const setEnding = (patch: Partial<NonNullable<Doc['ending']>>) =>
+    edit((prev: Doc) => ({...prev, ending: {...(prev.ending ?? {}), ...patch}}))
+
+  const setChoice = (index: number, patch: Partial<Choice>) =>
+    edit((prev: Doc) => {
+      const choices = (prev.choices ?? []).slice()
+      choices[index] = {...choices[index], ...patch}
+      return {...prev, choices}
+    })
+
+  const addChoice = () =>
+    edit((prev: Doc) => ({
+      ...prev,
+      choices: [...(prev.choices ?? []), {_key: crypto.randomUUID(), label: ''}],
+    }))
+
+  const addChoiceTarget = (targetId: string) =>
+    edit((prev: Doc) => ({
+      ...prev,
+      choices: [
+        ...(prev.choices ?? []),
+        {_key: crypto.randomUUID(), label: '', next: {_type: 'reference', _ref: targetId}},
+      ],
+    }))
+
+  const removeChoice = (index: number) =>
+    edit((prev: Doc) => ({...prev, choices: (prev.choices ?? []).filter((_, i) => i !== index)}))
+
+  const createLinkedIncident = async () => {
+    const handle = await createIncident({
+      title: 'Untitled incident',
+      incidentCode: 'NEW-??',
+      caseFile: {_type: 'reference', _ref: caseHandle.documentId},
+      order: (doc?.order ?? 1) + 1,
+    } as Partial<Omit<Doc, '_id' | '_type' | '_rev' | '_createdAt' | '_updatedAt'>>)
+    await apply(publishDocument(handle))
+    addChoiceTarget(handle.documentId)
+  }
+
+  const others = siblings.filter((s) => s._id !== incidentHandle.documentId)
+  const isEnding = doc?.ending?.isEnding === true
+
+  return (
+    <aside className="drawer">
+      <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+        <h3>{doc?.incidentCode ?? '…'} — incident</h3>
+        <button className="btn ghost small" onClick={onClose}>
+          Close
+        </button>
+      </div>
+
+      <div className="field">
+        <label>Title</label>
+        <input type="text" value={doc?.title ?? ''} onChange={(e) => set({title: e.currentTarget.value})} />
+      </div>
+      <div className="field">
+        <label>Incident code</label>
+        <input type="text" value={doc?.incidentCode ?? ''} onChange={(e) => set({incidentCode: e.currentTarget.value})} />
+      </div>
+      <div className="field">
+        <label>Order (0 = entry)</label>
+        <input
+          type="number"
+          value={doc?.order ?? 0}
+          onChange={(e) => set({order: Number(e.currentTarget.value)})}
+        />
+      </div>
+      <div className="field">
+        <label>Report</label>
+        <textarea value={doc?.report ?? ''} onChange={(e) => set({report: e.currentTarget.value})} />
+      </div>
+
+      <div className="section-label">Ending</div>
+      <div className="field">
+        <label>
+          <input
+            type="checkbox"
+            checked={isEnding}
+            onChange={(e) => setEnding({isEnding: e.currentTarget.checked})}
+          />{' '}
+          This is an ending
+        </label>
+      </div>
+      {isEnding && (
+        <>
+          <div className="field">
+            <label>Designation</label>
+            <select
+              value={doc?.ending?.designation ?? 'ANOMALY'}
+              onChange={(e) => setEnding({designation: e.currentTarget.value})}
+            >
+              <option value="REPRIEVE">REPRIEVE</option>
+              <option value="ANOMALY">ANOMALY</option>
+              <option value="CATASTROPHE">CATASTROPHE</option>
+            </select>
+          </div>
+          <div className="field">
+            <label>Epilogue</label>
+            <textarea
+              style={{minHeight: '4rem'}}
+              value={doc?.ending?.epilogue ?? ''}
+              onChange={(e) => setEnding({epilogue: e.currentTarget.value})}
+            />
+          </div>
+        </>
+      )}
+
+      {!isEnding && (
+        <>
+          <div className="section-label" style={{display: 'flex', justifyContent: 'space-between'}}>
+            <span>Choices</span>
+            <button className="btn small" onClick={() => void addChoice()}>
+              + Choice
+            </button>
+          </div>
+          {(doc?.choices ?? []).map((choice, i) => (
+            <div className="choice-item" key={choice._key ?? i}>
+              <div className="row">
+                <input
+                  type="text"
+                  placeholder="Choice label"
+                  value={choice.label ?? ''}
+                  onChange={(e) => setChoice(i, {label: e.currentTarget.value})}
+                />
+                <button className="btn danger small" onClick={() => void removeChoice(i)}>
+                  ×
+                </button>
+              </div>
+              <div className="row">
+                <input
+                  type="text"
+                  placeholder="Consequence note (optional)"
+                  value={choice.consequenceNote ?? ''}
+                  onChange={(e) => setChoice(i, {consequenceNote: e.currentTarget.value})}
+                />
+              </div>
+              <div className="row">
+                <select
+                  value={choice.next?._ref ?? ''}
+                  onChange={(e) =>
+                    setChoice(
+                      i,
+                      e.currentTarget.value ? {next: {_type: 'reference', _ref: e.currentTarget.value}} : {next: undefined},
+                    )
+                  }
+                >
+                  <option value="">— pick target —</option>
+                  {others.map((s) => (
+                    <option key={s._id} value={s._id}>
+                      {s.incidentCode ?? s._id}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          ))}
+          <button className="btn ghost small" onClick={() => void createLinkedIncident()}>
+            + New incident linked from here
+          </button>
+        </>
+      )}
+
+      <div className="section-label" style={{display: 'flex', justifyContent: 'space-between'}}>
+        <span>Ending options</span>
+        <button className="btn ghost small" onClick={() => setEndingOpen((v) => !v)}>
+          {endingOpen ? 'Hide' : 'Show'}
+        </button>
+      </div>
+      {endingOpen && (
+        <p style={{color: 'var(--muted)', fontSize: '0.82rem'}}>
+          Endings are stamped in the reader as REPRIEVE, ANOMALY, or CATASTROPHE. No Bureau member may create new
+          designations.
+        </p>
+      )}
+    </aside>
+  )
+}

@@ -1,0 +1,49 @@
+---
+import Base from '../layouts/Base.astro'
+---
+
+<Base title="About the Bureau">
+  <article class="prose">
+    <h1>About the Bureau</h1>
+    <p>
+      The Bureau of Almost-Happened Events maintains the archive of counterfactual
+      incident reports: the branching record of what <em>would</em> have occurred.
+      Every docket is a directed graph of documents — readers traverse the graph,
+      and the Bureau stamps every conclusion.
+    </p>
+
+    <h2>How the archive is filed</h2>
+    <table>
+      <thead>
+        <tr><th>Document</th><th>Purpose</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>caseFile</code></td>
+          <td>A docket. Carries the premise, the filing code, and a review status that gates publication.</td>
+        </tr>
+        <tr>
+          <td><code>incident</code></td>
+          <td>One node in the graph. Its <code>choices[]</code> are references to sibling incidents; an incident with no choices must be stamped as an ending.</td>
+        </tr>
+        <tr>
+          <td><code>artifact</code></td>
+          <td>Evidence attached to an incident — instruments, memos, photographs — rendered as generated cards.</td>
+        </tr>
+        <tr>
+          <td><code>review</code></td>
+          <td>An append-only approval trail. Authors submit rounds; curators approve or request changes. A Sanity Function syncs the decision back to the docket.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>Reading a docket</h2>
+    <p>
+      Entry is always the incident with <code>order == 0</code>. Choices are labeled
+      doors; consequence notes are the Bureau's own marginalia. Three designations
+      end a path: <strong>REPRIEVE</strong>, <strong>ANOMALY</strong>, and
+      <strong>CATASTROPHE</strong>. The Bureau does not explain the difference. You
+      will know when you get there.
+    </p>
+  </article>
+</Base>

@@ -1,0 +1,38 @@
+---
+import '../styles/global.css'
+
+interface Props {
+  title: string
+  description?: string
+}
+
+const {title, description} = Astro.props
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description ?? 'The Bureau of Almost-Happened Events — an archive of counterfactual incident reports.'} />
+    <title>{title} · Bureau of Almost-Happened Events</title>
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="/">
+        <span class="brand-mark" aria-hidden="true">§</span>
+        <span>Bureau of Almost&#8209;Happened Events</span>
+      </a>
+      <nav>
+        <a href="/">Dockets</a>
+        <a href="/about">About the Bureau</a>
+      </nav>
+    </header>
+    <main>
+      <slot />
+    </main>
+    <footer class="site-footer">
+      <p>Filed in the Content Lake. Stamps are final.</p>
+    </footer>
+  </body>
+</html>

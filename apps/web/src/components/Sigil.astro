@@ -1,0 +1,46 @@
+---
+interface Props {
+  kind?: 'orbit' | 'seal' | 'wave'
+  size?: number
+}
+const {kind = 'seal', size = 64} = Astro.props
+---
+
+<svg
+  width={size}
+  height={size}
+  viewBox="0 0 64 64"
+  role="img"
+  aria-label={`Bureau sigil, ${kind}`}
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+>
+  <circle cx="32" cy="32" r="28" />
+  {
+    kind === 'orbit' && (
+      <>
+        <ellipse cx="32" cy="32" rx="24" ry="10" transform="rotate(-18 32 32)" />
+        <circle cx="32" cy="32" r="4" fill="currentColor" />
+        <circle cx="50" cy="26" r="2.5" fill="currentColor" />
+      </>
+    )
+  }
+  {
+    kind === 'seal' && (
+      <>
+        <circle cx="32" cy="32" r="18" stroke-dasharray="4 3" />
+        <path d="M32 14v8M32 42v8M14 32h8M42 32h8" />
+        <circle cx="32" cy="32" r="3" fill="currentColor" />
+      </>
+    )
+  }
+  {
+    kind === 'wave' && (
+      <>
+        <path d="M14 28c4-5 8-5 12 0s8 5 12 0 8-5 12 0" />
+        <path d="M14 38c4-5 8-5 12 0s8 5 12 0 8-5 12 0" />
+      </>
+    )
+  }
+</svg>

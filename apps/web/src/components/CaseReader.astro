@@ -1,0 +1,29 @@
+---
+interface Props {
+  graph: {
+    title: string
+    docketNumber: string
+    premise?: string
+    sigil?: 'orbit' | 'seal' | 'wave'
+    incidents: unknown[]
+  }
+}
+const {graph} = Astro.props
+import Sigil from './Sigil.astro'
+---
+
+<div class="case-cover">
+  <span class="docket">{graph.docketNumber}</span>
+  <h1>{graph.title}</h1>
+  {graph.premise && <p class="premise">{graph.premise}</p>}
+  <span class="stamp" aria-hidden="true"><Sigil kind={graph.sigil ?? 'seal'} size={72} /></span>
+</div>
+
+<div id="reader" data-noop></div>
+<script type="application/json" id="case-graph" set:html={JSON.stringify({docketNumber: graph.docketNumber, incidents: graph.incidents})}></script>
+
+<script>
+  import {startReader} from '../scripts/reader'
+  const el = document.getElementById('case-graph')
+  if (el?.textContent) startReader(JSON.parse(el.textContent))
+</script>
