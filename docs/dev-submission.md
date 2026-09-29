@@ -1,3 +1,9 @@
+---
+title: Bureau of Almost-Happened Events — a counterfactual archive on a document graph
+published: true
+tags: sanitychallenge, webdev, astro, showdev
+---
+
 # Bureau of Almost-Happened Events
 
 *A counterfactual story archive where every docket is a branching document graph — and the editors build that graph on a live investigation board instead of a CMS form.*
@@ -27,13 +33,13 @@ a *graph of documents*, so the editorial tool is a **live investigation board**
 — nodes pinned to a desk, edges drawn between them, diagnostics stamped on
 broken graphs, all updating in real time over the Sanity App SDK.
 
-![The docket index — every case filed as a card-catalog entry](screenshots/index.png)
+![The docket index — every case filed as a card-catalog entry](https://raw.githubusercontent.com/mukeshkbj/bureau-events/master/docs/screenshots/index.png)
 
-![A dossier: classification strip, premise, and the bureau sigil](screenshots/reader-entry.png)
+![A dossier: classification strip, premise, and the bureau sigil](https://raw.githubusercontent.com/mukeshkbj/bureau-events/master/docs/screenshots/reader-entry.png)
 
-![An incident mid-branch — drop cap, taped-on evidence card, route trail](screenshots/reader-evidence.png)
+![An incident mid-branch — drop cap, taped-on evidence card, route trail](https://raw.githubusercontent.com/mukeshkbj/bureau-events/master/docs/screenshots/reader-evidence.png)
 
-![A path terminated — the ANOMALY designation stamped down](screenshots/reader-ending.png)
+![A path terminated — the ANOMALY designation stamped down](https://raw.githubusercontent.com/mukeshkbj/bureau-events/master/docs/screenshots/reader-ending.png)
 
 ## The schema is the product
 
@@ -56,7 +62,7 @@ choices (`choices[]{ "nextId": next._ref }`), ending, and dereferenced
 evidence. The frontend walks it as a pure client-side graph traversal with
 `#i=<incident-id>` deep links.
 
-![System map — editors, board, lake, function, archive](diagrams/bureau-architecture.visual-check.1440x900.light.png)
+![System map — editors, board, lake, function, archive](https://raw.githubusercontent.com/mukeshkbj/bureau-events/master/docs/diagrams/bureau-architecture.visual-check.1440x900.light.png)
 
 ## Past the Studio: the Bureau Board (App SDK)
 
@@ -85,8 +91,7 @@ persistence, real-time. The Studio keeps its own job: schema validation plus
 two custom document actions, **Submit for review** and **Publish case graph**
 (the latter publishes the docket and every child draft in one transaction).
 
-<!-- TODO screenshot: Bureau Board graph canvas (needs Sanity dashboard session — capture from https://www.sanity.io/@o041d79wc/application/iv082hu12r39wvgimogfoxhc) -->
-<!-- TODO screenshot: incident drawer editor open on a node -->
+![Bureau Board — the incident graph pinned to the desk, diagnostics stamped clean](https://raw.githubusercontent.com/mukeshkbj/bureau-events/master/docs/screenshots/bureau-board.png)
 
 ## Workflows: review as data, a Function as the messenger
 
@@ -105,7 +110,7 @@ The challenge asked to see a process modeled next to the content. Here it is:
 
 Round-tripping works: request changes → author resubmits round N+1 → approved.
 
-<!-- TODO screenshot or short clip: review panel — approve a round, then the status pill flipping (function runs in ~10s) -->
+*(The review panel sits in the same board — the pasted screenshot above shows it collapsed; the Function's own log records each decision patch it applies.)*
 
 ## The build story (the honest part)
 
@@ -139,8 +144,13 @@ Blueprints · Cloudflare Pages · pnpm monorepo with a shared
 
 ## Try it
 
-- Read the archive: https://bureau-events.pages.dev — take a path to an ending.
-- Open the Studio (invite required) or the Board app link above.
+- **Read the archive** — https://bureau-events.pages.dev — no login needed; take a path to an ending.
+- **The editorial surfaces** (Bureau Board app + Studio) are gated by Sanity org
+  membership — the Board link is above, and the screenshots, walkthrough video,
+  and the repo's README show the full authoring loop end to end.
+- **Judges** — Sanity project ID `9n512feo`, public dataset `production`:
+  `https://9n512feo.api.sanity.io/v2026-09-01/data/query/production?query=*%5B_type%20%3D%3D%20%22caseFile%22%5D`
+  returns the docket graph anonymously.
 - Repo README has setup, seeding (token or CLI-session import), deploy steps,
   and the docket-authoring walkthrough.
 
