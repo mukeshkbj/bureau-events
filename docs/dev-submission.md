@@ -7,7 +7,7 @@
 | | |
 |---|---|
 | **Live archive** | https://bureau-events.pages.dev |
-| **Repository** | https://github.com/mukeshkbj/bureau-events *(placeholder — pending push)* |
+| **Repository** | https://github.com/mukeshkbj/bureau-events |
 | **Studio** | https://bureau-events.sanity.studio |
 | **Bureau Board (App SDK app)** | https://www.sanity.io/@o041d79wc/application/iv082hu12r39wvgimogfoxhc |
 | **Sanity project** | `9n512feo` · dataset `production` (public read) |
