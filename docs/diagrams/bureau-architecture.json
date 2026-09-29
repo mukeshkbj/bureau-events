@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Bureau of Almost-Happened Events",
+    "output": "bureau-architecture.html",
+    "quality_profile": "showcase",
+    "views": [
+      {
+        "id": "editorial-path",
+        "label": "Editorial path",
+        "focus": ["editors", "board", "studio", "lake"],
+        "note": "Authors draw the incident graph on the Bureau Board; curators approve it through the Studio."
+      },
+      {
+        "id": "review-loop",
+        "label": "Review loop",
+        "focus": ["lake", "func"],
+        "note": "A published review decision fires the Function, which stamps reviewStatus back onto the docket."
+      },
+      {
+        "id": "reader-path",
+        "label": "Reader path",
+        "focus": ["lake", "web", "pages", "visitors"],
+        "note": "Approved dockets are fetched at build time and served as a static archive."
+      }
+    ]
+  },
+  "components": [
+    {"id": "editors", "type": "external", "label": "Bureau editors", "sublabel": "authors + curators", "pos": [40, 320], "size": [130, 64]},
+    {"id": "board", "type": "frontend", "label": "Bureau Board", "sublabel": "App SDK · apps/editor", "pos": [280, 330], "size": [150, 66], "tag": "real-time"},
+    {"id": "studio", "type": "frontend", "label": "Sanity Studio", "sublabel": "apps/studio", "pos": [280, 160], "size": [150, 64], "tag": "publish action"},
+    {"id": "lake", "type": "database", "label": "Content Lake", "sublabel": "production dataset", "pos": [540, 310], "size": [150, 72], "tag": "document graph"},
+    {"id": "func", "type": "backend", "label": "sync-review-decision", "sublabel": "Sanity Function · blueprint", "pos": [540, 500], "size": [170, 64]},
+    {"id": "web", "type": "frontend", "label": "Astro archive", "sublabel": "apps/web · static", "pos": [770, 320], "size": [150, 64]},
+    {"id": "pages", "type": "cloud", "label": "Cloudflare Pages", "sublabel": "dist/ hosting", "pos": [970, 320], "size": [140, 64]},
+    {"id": "visitors", "type": "external", "label": "Readers", "sublabel": "public archive", "pos": [1160, 320], "size": [110, 64]}
+  ],
+  "boundaries": [
+    {"kind": "region", "label": "Sanity · project 9n512feo", "wraps": ["studio", "board", "lake", "func"], "pad": 24},
+    {"kind": "region", "label": "Cloudflare", "wraps": ["pages"]}
+  ],
+  "connections": [
+    {"id": "ed-to-board", "from": "editors", "to": "board", "label": "edit graph live", "variant": "emphasis"},
+    {"id": "ed-to-studio", "from": "editors", "to": "studio", "label": "review + publish", "variant": "dashed", "fromSide": "top", "toSide": "top", "via": [[105, 108], [355, 108]]},
+    {"id": "board-to-lake", "from": "board", "to": "lake", "label": "documents + GROQ", "variant": "emphasis"},
+    {"id": "studio-to-lake", "from": "studio", "to": "lake", "label": "publish case graph", "variant": "security", "toSide": "top"},
+    {"id": "lake-to-func", "from": "lake", "to": "func", "label": "review event → patch status", "variant": "dashed", "fromSide": "bottom", "toSide": "top"},
+    {"id": "lake-to-web", "from": "lake", "to": "web", "label": "approved dockets at build", "variant": "emphasis", "labelAt": [725, 402]},
+    {"id": "web-to-pages", "from": "web", "to": "pages", "label": "deploy", "variant": "emphasis"},
+    {"id": "pages-to-readers", "from": "pages", "to": "visitors", "label": "HTTPS", "variant": "emphasis"}
+  ],
+  "cards": [
+    {"dot": "cyan", "title": "Content model", "items": ["caseFile dockets carry premise, slug, review status", "incident nodes branch through referenced choices", "artifact + review documents hang off the same graph"]},
+    {"dot": "emerald", "title": "Workflow", "items": ["authors submit a review round from the board", "a curator's decision fires the Function, which patches reviewStatus", "only approved dockets enter the public build"]},
+    {"dot": "amber", "title": "Interfaces", "items": ["Bureau Board: live graph editing over the App SDK", "Studio: publish-case-graph document action", "Astro reader: branching archive rendered from one GROQ graph"]}
+  ]
+}
