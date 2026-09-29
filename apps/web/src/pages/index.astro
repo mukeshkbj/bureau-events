@@ -26,6 +26,7 @@ const cases = await safeFetch<CaseRow[]>(caseIndexQuery, {}, [])
   {
     cases.length === 0 ? (
       <div class="empty-state">
+        <span class="stamp-empty">No cases filed</span>
         The archive is empty. No cases have been approved for public release.
       </div>
     ) : (
@@ -33,11 +34,12 @@ const cases = await safeFetch<CaseRow[]>(caseIndexQuery, {}, [])
         {cases.map((c) => (
           <li>
             <a class="case-card" href={`/case/${c.slug}`}>
-              <Sigil kind={c.sigil ?? 'seal'} size={56} />
+              <span class="sigil-slot"><Sigil kind={c.sigil ?? 'seal'} size={56} /></span>
               <span>
                 <span class="docket">{c.docketNumber}</span>
                 <h2>{c.title}</h2>
                 {c.dek && <p>{c.dek}</p>}
+                <span class="open">Open docket ▸</span>
               </span>
             </a>
           </li>

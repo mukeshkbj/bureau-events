@@ -43,6 +43,8 @@ const paragraphs = (text: string) =>
 
 const evidenceHtml = (a: ArtifactRef) => `
   <div class="evidence">
+    <span class="tape t1" aria-hidden="true"></span>
+    <span class="tape t2" aria-hidden="true"></span>
     <div class="head"><span>EVIDENCE ${esc(a.artifactCode)}</span><span>${esc(a.kind ?? 'item')}</span></div>
     <div class="title">${esc(a.title)}</div>
     ${a.caption ? `<div>${esc(a.caption)}</div>` : ''}
@@ -112,7 +114,7 @@ export function startReader(graph: Graph) {
     if (isEnding) {
       choicesHtml = `
         <div class="ending-stamp">${esc(inc.ending?.designation ?? 'FILED')}</div>
-        ${inc.ending?.epilogue ? `<p><em>${esc(inc.ending.epilogue)}</em></p>` : ''}
+        ${inc.ending?.epilogue ? `<p class="epilogue"><em>${esc(inc.ending.epilogue)}</em></p>` : ''}
         <div class="reader-actions">
           <button class="btn-plain" data-action="restart">File another path</button>
           ${trail.length > 0 ? '<button class="btn-plain" data-action="back">Step back</button>' : ''}
@@ -135,7 +137,7 @@ export function startReader(graph: Graph) {
     }
 
     root!.innerHTML = `
-      <div class="trail" aria-label="Path taken">${crumbs}</div>
+      <div class="trail" aria-label="Path taken"><span class="route-label">ROUTE</span>${crumbs}</div>
       <article class="report-card">
         <div class="code">INCIDENT ${esc(inc.incidentCode)} · DOCKET ${esc(graph.docketNumber)}</div>
         <h2>${esc(inc.title)}</h2>

@@ -15,15 +15,27 @@ const {title, description} = Astro.props
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description ?? 'The Bureau of Almost-Happened Events — an archive of counterfactual incident reports.'} />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300..900&family=Spectral:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Courier+Prime:wght@400;700&family=Special+Elite&display=swap"
+      rel="stylesheet"
+    />
     <title>{title} · Bureau of Almost-Happened Events</title>
   </head>
   <body>
+    <div class="form-meta">
+      <span>Form 27-B (rev. whenever)</span>
+      <span>Dept. of Counterfactual Incidents</span>
+      <span>Retain for the record</span>
+    </div>
     <header class="site-header">
       <a class="brand" href="/">
-        <span class="brand-mark" aria-hidden="true">§</span>
-        <span>Bureau of Almost&#8209;Happened Events</span>
+        <span class="brand-seal" aria-hidden="true">§</span>
+        <span class="brand-name">Bureau of Almost&#8209;Happened Events</span>
+        <span class="brand-sub">Office of Counterfactual Records</span>
       </a>
-      <nav>
+      <nav class="site-nav">
         <a href="/">Dockets</a>
         <a href="/about">About the Bureau</a>
       </nav>
@@ -32,7 +44,8 @@ const {title, description} = Astro.props
       <slot />
     </main>
     <footer class="site-footer">
-      <p>Filed in the Content Lake. Stamps are final.</p>
+      <p style="margin:0">Filed in the Content Lake. Stamps are final.</p>
+      <div class="barcode" aria-hidden="true"></div>
     </footer>
   </body>
 </html>

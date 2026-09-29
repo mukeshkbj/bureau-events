@@ -12,7 +12,7 @@ const {graph} = Astro.props
 import Sigil from './Sigil.astro'
 ---
 
-<div class="case-cover">
+<div class="case-cover" data-classification={`Form BAH-114 — Docket ${graph.docketNumber} · Division of Counterfactual Incidents`}>
   <span class="docket">{graph.docketNumber}</span>
   <h1>{graph.title}</h1>
   {graph.premise && <p class="premise">{graph.premise}</p>}

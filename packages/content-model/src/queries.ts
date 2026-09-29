@@ -52,6 +52,18 @@ export const childIdsQuery = `*[
   _type in ["incident", "artifact"] && caseFile._ref == $caseId && !(_id in path("drafts.**"))
 ]._id`
 
+/** Artifacts belonging to a case — the evidence picker in the board. */
+export const caseArtifactsQuery = defineQuery(`*[
+  _type == "artifact" && caseFile._ref == $caseId
+] | order(_createdAt asc) {
+  _id, artifactCode, title, kind
+}`)
+
+/** Every docket number — used to assign the next BAH-XXXX when filing a new case. */
+export const docketNumbersQuery = defineQuery(`*[
+  _type == "caseFile" && defined(docketNumber)
+].docketNumber`)
+
 /** Pending reviews — the curator queue. */
 export const pendingReviewsQuery = defineQuery(`*[
   _type == "review" && decision == "pending"

@@ -11,3 +11,4 @@ dist/
 *.tsbuildinfo
 coverage/
 .DS_Store
+preview.log
