@@ -27,8 +27,15 @@ export const caseBoardQuery = defineQuery(`*[
   _id, incidentCode, title, order,
   "isEnding": ending.isEnding,
   "choiceTargets": choices[].next._ref,
-  "choiceLabels": choices[].label
+  "choiceLabels": choices[].label,
+  "choiceRefs": choices[]{ _key, "nextId": next._ref }
 }`)
+
+/** Published ids of every child document under a case — for cascade deletion. */
+export const caseDescendantIdsQuery = defineQuery(`*[
+  _type in ["incident", "artifact", "review"] && caseFile._ref == $caseId
+  && !(_id in path("drafts.**"))
+]._id`)
 
 /** Reviews for one case, newest round first. */
 export const caseReviewsQuery = defineQuery(`*[

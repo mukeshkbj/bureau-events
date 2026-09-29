@@ -22,6 +22,7 @@ const PAD = 32
 
 interface BoardIncident extends GraphIncident {
   title?: string
+  choiceRefs?: {_key?: string; nextId?: string | null}[]
 }
 
 interface Position {
@@ -55,7 +56,7 @@ function layout(incidents: BoardIncident[]): Map<string, Position> {
   return positions
 }
 
-export function CaseBoard({caseHandle}: {caseHandle: DocumentHandle}) {
+export function CaseBoard({caseHandle, onCaseDeleted}: {caseHandle: DocumentHandle; onCaseDeleted: () => void}) {
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [showReviews, setShowReviews] = useState(false)
   const [showSettings, setShowSettings] = useState(false)
@@ -148,7 +149,7 @@ export function CaseBoard({caseHandle}: {caseHandle: DocumentHandle}) {
         </div>
       </div>
 
-      {showSettings && <CaseSettings caseHandle={caseHandle} />}
+      {showSettings && <CaseSettings caseHandle={caseHandle} onDeleted={onCaseDeleted} />}
       {showReviews && <ReviewPanel caseHandle={caseHandle} />}
 
       <div className="board-grid" style={{width: canvasW, height: canvasH}}>
@@ -214,6 +215,7 @@ export function CaseBoard({caseHandle}: {caseHandle: DocumentHandle}) {
 
       {selectedId && (
         <IncidentEditor
+          key={selectedId}
           incidentHandle={{documentId: selectedId, documentType: 'incident'}}
           caseHandle={caseHandle}
           siblings={nodes}

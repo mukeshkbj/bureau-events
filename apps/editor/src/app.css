@@ -257,6 +257,14 @@ button, input, textarea, select { font: inherit; color: inherit; }
 
 .artifact-panel { border: 1px dashed var(--line); padding: 0.7rem; margin-bottom: 0.6rem; background: var(--panel-2); }
 
+.danger-box {
+  border: 1px dashed var(--red);
+  padding: 0.7rem;
+  margin-bottom: 0.6rem;
+  background: rgb(192 85 63 / 0.08);
+}
+.danger-box p { margin: 0 0 0.5rem; font-size: 0.82rem; color: var(--muted); }
+
 @media (max-width: 720px) {
   .settings-grid { grid-template-columns: 1fr; }
   .settings-grid .span2 { grid-column: auto; }

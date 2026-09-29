@@ -1,9 +1,13 @@
+import {useState} from 'react'
 import {
+  useClient,
   useDocument,
   useEditDocument,
+  useQuery,
   type DocumentHandle,
   type SanityDocument,
 } from '@sanity/sdk-react'
+import {caseDescendantIdsQuery} from '@bureau/content-model/queries'
 
 type CaseDoc = SanityDocument & {
   title?: string
@@ -22,13 +26,37 @@ const slugify = (s: string) =>
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '')
 
-export function CaseSettings({caseHandle}: {caseHandle: DocumentHandle}) {
+export function CaseSettings({caseHandle, onDeleted}: {caseHandle: DocumentHandle; onDeleted: () => void}) {
   const {data: doc} = useDocument<CaseDoc>({...caseHandle})
   const edit = useEditDocument<CaseDoc>(caseHandle)
+  const client = useClient({apiVersion: '2026-09-01'})
+  const {data: descendants} = useQuery<string[]>({
+    query: caseDescendantIdsQuery,
+    params: {caseId: caseHandle.documentId},
+  })
+  const [confirmDelete, setConfirmDelete] = useState(false)
+  const [deleting, setDeleting] = useState(false)
 
   const set = (patch: Partial<CaseDoc>) => edit((prev: CaseDoc) => ({...prev, ...patch}))
 
   const docketOk = /^BAH-\d{4}$/.test(doc?.docketNumber ?? '')
+
+  const deleteDocket = async () => {
+    setDeleting(true)
+    try {
+      const ids = [caseHandle.documentId, ...(descendants ?? [])]
+      const tx = client.transaction()
+      for (const id of ids) {
+        tx.delete(id)
+        tx.delete(`drafts.${id}`)
+      }
+      await tx.commit()
+      onDeleted()
+    } finally {
+      setDeleting(false)
+      setConfirmDelete(false)
+    }
+  }
 
   return (
     <div className="diagnostics case-settings">
@@ -83,6 +111,27 @@ export function CaseSettings({caseHandle}: {caseHandle: DocumentHandle}) {
           {doc?.publishedAt ? `Published ${new Date(doc.publishedAt).toLocaleDateString()}` : 'No publish date on file'}
         </span>
       </div>
+      <div className="section-label">Danger zone</div>
+      {confirmDelete ? (
+        <div className="danger-box">
+          <p>
+            Removes this docket and {(descendants ?? []).length} linked document(s) — incidents, artifacts, and
+            reviews all go.
+          </p>
+          <div style={{display: 'flex', gap: '0.4rem'}}>
+            <button className="btn danger small" disabled={deleting} onClick={() => void deleteDocket()}>
+              {deleting ? 'Destroying…' : 'Confirm destruction'}
+            </button>
+            <button className="btn ghost small" disabled={deleting} onClick={() => setConfirmDelete(false)}>
+              Keep the docket
+            </button>
+          </div>
+        </div>
+      ) : (
+        <button className="btn danger small" onClick={() => setConfirmDelete(true)}>
+          Destroy docket
+        </button>
+      )}
     </div>
   )
 }

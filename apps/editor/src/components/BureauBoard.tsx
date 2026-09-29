@@ -18,7 +18,7 @@ export function BureauBoard() {
         </div>
       </aside>
       {selectedCase ? (
-        <CaseBoard caseHandle={selectedCase} />
+        <CaseBoard caseHandle={selectedCase} onCaseDeleted={() => setSelectedCase(null)} />
       ) : (
         <div className="empty-board">Select a docket to open its incident graph.</div>
       )}

@@ -2,6 +2,7 @@ import {useState} from 'react'
 import {
   publishDocument,
   useApplyDocumentActions,
+  useClient,
   useCreateDocument,
   useDocument,
   useEditDocument,
@@ -37,6 +38,10 @@ type Doc = SanityDocument & {
   choices?: Choice[]
 }
 
+type SiblingIncident = GraphIncident & {
+  choiceRefs?: {_key?: string; nextId?: string | null}[]
+}
+
 export function IncidentEditor({
   incidentHandle,
   caseHandle,
@@ -45,7 +50,7 @@ export function IncidentEditor({
 }: {
   incidentHandle: DocumentHandle
   caseHandle: DocumentHandle
-  siblings: GraphIncident[]
+  siblings: SiblingIncident[]
   onClose: () => void
 }) {
   const {data: doc} = useDocument<Doc>({...incidentHandle})
@@ -53,7 +58,10 @@ export function IncidentEditor({
   const createIncident = useCreateDocument<Doc>({documentType: 'incident'})
   const createArtifact = useCreateDocument<SanityDocument>({documentType: 'artifact'})
   const apply = useApplyDocumentActions()
+  const client = useClient({apiVersion: '2026-09-01'})
   const [endingOpen, setEndingOpen] = useState(false)
+  const [confirmDelete, setConfirmDelete] = useState(false)
+  const [deleting, setDeleting] = useState(false)
   const {data: artifacts} = useQuery<ArtifactRow[]>({
     query: caseArtifactsQuery,
     params: {caseId: caseHandle.documentId},
@@ -105,6 +113,30 @@ export function IncidentEditor({
     )
     await apply(publishDocument(handle))
     attachArtifact(handle.documentId)
+  }
+
+  // Doors pointing at this node are unset in the same transaction, so no
+  // sibling is left referencing a deleted target.
+  const deleteIncident = async () => {
+    setDeleting(true)
+    try {
+      const tx = client.transaction()
+      for (const sib of siblings) {
+        const keys = (sib.choiceRefs ?? [])
+          .filter((c) => c.nextId === incidentHandle.documentId && c._key)
+          .map((c) => c._key!)
+        if (keys.length > 0) {
+          tx.patch(sib._id, {unset: keys.map((k) => `choices[_key=="${k}"]`)})
+        }
+      }
+      tx.delete(incidentHandle.documentId)
+      tx.delete(`drafts.${incidentHandle.documentId}`)
+      await tx.commit()
+      onClose()
+    } finally {
+      setDeleting(false)
+      setConfirmDelete(false)
+    }
   }
 
   const createLinkedIncident = async () => {
@@ -280,6 +312,25 @@ export function IncidentEditor({
           Endings are stamped in the reader as REPRIEVE, ANOMALY, or CATASTROPHE. No Bureau member may create new
           designations.
         </p>
+      )}
+
+      <div className="section-label">Danger zone</div>
+      {confirmDelete ? (
+        <div className="danger-box">
+          <p>Removes this incident and unthreads every door that leads to it.</p>
+          <div style={{display: 'flex', gap: '0.4rem'}}>
+            <button className="btn danger small" disabled={deleting} onClick={() => void deleteIncident()}>
+              {deleting ? 'Striking…' : 'Confirm strike'}
+            </button>
+            <button className="btn ghost small" disabled={deleting} onClick={() => setConfirmDelete(false)}>
+              Keep it
+            </button>
+          </div>
+        </div>
+      ) : (
+        <button className="btn danger small" onClick={() => setConfirmDelete(true)}>
+          Strike incident from the record
+        </button>
       )}
     </aside>
   )

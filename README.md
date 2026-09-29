@@ -50,7 +50,10 @@ URLs deep-link into a specific incident.
    **+ New incident linked from here** to grow a branch with the choice already
    wired.
 4. **Evidence** attaches an existing artifact or creates one inline.
-5. **Reviews** submits a round; a curator decides; the Function flips
+5. **Danger zones** strike cleanly: deleting an incident unthreads every
+   choice pointing at it in the same transaction; destroying a docket removes
+   its incidents, artifacts, and reviews together.
+6. **Reviews** submits a round; a curator decides; the Function flips
    `reviewStatus` automatically.
 
 **As a curator** — Studio or the Board's review panel: read the author's note,
