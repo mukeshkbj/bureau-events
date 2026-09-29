@@ -6,6 +6,57 @@ Editors work in a custom real-time board (App SDK) rather than the Studio form.
 
 DEV × Sanity Challenge — Path Two submission.
 
+## How it works, end to end
+
+The story is a document graph. A `caseFile` is a docket; each `incident` is a
+node whose `choices[]` are document references to sibling incidents; `artifact`
+and `review` documents hang off the same graph.
+
+```
+Author opens Bureau Board ──► + File new docket (auto BAH-XXXX)
+        │
+        ├──► Docket details: title, slug, premise, sigil
+        ├──► + Incident → nodes appear on the graph board
+        │       ├── edit report / incident code / order (0 = entry)
+        │       ├── wire choices → references to sibling incidents
+        │       ├── attach or + New artifact (evidence)
+        │       └── mark endings (REPRIEVE / ANOMALY / CATASTROPHE)
+        │
+        ├──► Graph check flags unreachable nodes, missing targets, no endings
+        ├──► Reviews → "Submit for review" creates a review doc (round N)
+        ├──► Curator approves or requests changes
+        │       └── Function fires → patches caseFile.reviewStatus
+        └──► Studio "Publish case graph" → whole graph published in one tx
+                     │
+        apps/web rebuilds ──► approved dockets appear on the index
+                     │
+        Reader opens /case/<slug> → picks choices → stamped ending
+```
+
+## Using it
+
+**As a reader** — open the site, click a docket card, read the incident report,
+press a choice. Evidence cards appear taped into reports; the ROUTE trail shows
+the path taken; endings stamp down and offer another path. `#i=<incident-id>`
+URLs deep-link into a specific incident.
+
+**As an author** (Bureau Board, via the Sanity dashboard app):
+
+1. `+ File new docket` in the left rail creates and selects a docket.
+2. **Docket details** sets title, slug, dek, premise, sigil (the slug is what
+   makes the public `/case/<slug>` route work).
+3. **+ Incident** creates a published node; on an empty graph it auto-becomes
+   the entry (`order: 0`). Click a node to edit it in the drawer — or use
+   **+ New incident linked from here** to grow a branch with the choice already
+   wired.
+4. **Evidence** attaches an existing artifact or creates one inline.
+5. **Reviews** submits a round; a curator decides; the Function flips
+   `reviewStatus` automatically.
+
+**As a curator** — Studio or the Board's review panel: read the author's note,
+walk the graph, Approve or Request changes. Approval plus the
+**Publish case graph** action ships it; the next static build picks it up.
+
 ## Layout
 
 ```
