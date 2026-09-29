@@ -144,4 +144,8 @@ Blueprints · Cloudflare Pages · pnpm monorepo with a shared
 - Repo README has setup, seeding (token or CLI-session import), deploy steps,
   and the docket-authoring walkthrough.
 
-<!-- OPTIONAL video/gif, 60–90s: file a docket → add incidents → submit review → approve → status flips → reload public index -->
+Demo walkthrough — index → dossier → choices → evidence → ending (62s, `docs/media/archive-walkthrough.webm`; upload to DEV as a video embed):
+
+https://github.com/mukeshkbj/bureau-events/blob/master/docs/media/archive-walkthrough.webm
+
+<!-- OPTIONAL second clip if you want the editorial side too: file a docket → add incidents → submit review → approve → status flips (needs a logged-in Sanity session — capture on your screen, e.g. Win+Alt+R) -->
