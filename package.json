@@ -17,10 +17,11 @@
   },
   "devDependencies": {
     "@sanity/blueprints": "^0.27.0",
-    "@sanity/functions": "^1.8.0",
     "@sanity/client": "^8.8.0",
-    "typescript": "^5.9.0",
+    "@sanity/functions": "^1.8.0",
+    "sanity": "^6.16.0",
     "tsx": "^4.20.0",
+    "typescript": "^5.9.0",
     "vitest": "^3.2.4"
   }
 }

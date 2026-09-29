@@ -13,8 +13,18 @@ const projectId = process.env.PUBLIC_SANITY_PROJECT_ID ?? process.env.SANITY_STU
 const dataset = process.env.PUBLIC_SANITY_DATASET ?? process.env.SANITY_STUDIO_DATASET ?? 'production'
 const token = process.env.SANITY_TOKEN ?? process.env.SANITY_API_WRITE_TOKEN
 
-if (!projectId || !token) {
-  console.error('Missing env: set PUBLIC_SANITY_PROJECT_ID and SANITY_TOKEN')
+if (!token) {
+  // No write token — emit NDJSON instead so `sanity dataset import` can apply
+  // the seed with the CLI's own session auth. Run:
+  //   pnpm -F @bureau/content-model exec tsx src/seed.ts > seed.ndjson
+  //   sanity dataset import seed.ndjson --dataset production
+  const docs = [...seedArtifacts, ...seedIncidents, seedCaseFile, seedReview]
+  for (const doc of docs) process.stdout.write(JSON.stringify(doc) + '\n')
+  process.exit(0)
+}
+
+if (!projectId) {
+  console.error('Missing env: set PUBLIC_SANITY_PROJECT_ID')
   process.exit(1)
 }
 

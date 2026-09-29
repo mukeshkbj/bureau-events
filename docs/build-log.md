@@ -101,6 +101,34 @@ deploy.
 - `@sanity/visual-editing@5.7.3` wants `@sanity/client ^7.24`; workspace has
   `8.8.0`. Visual editing isn't used in v1.
 
+### 6. The entire public site was silently empty — dotted `_id`s
+
+After seeding, the site rendered the empty-archive state despite 16 documents
+existing. Debugging ladder: `sanity documents query` saw everything, `curl`
+saw zero — because the CLI's `--anonymous` flag still attaches your session
+token (verified via `DEBUG=sanity*` request logging). The anonymous API
+returned `omitted: [{reason: "permission"}]` per document.
+
+Root cause: **document `_id`s containing `.` are namespaced and invisible to
+anonymous reads**, even in a public dataset. Every seed id was dotted
+(`incident.clk-00`). Renamed all seed ids to hyphenated form, recreated the
+dataset, re-imported — public queries immediately returned content.
+
+### 7. The review Function missed a decision — stale-read + idempotency
+
+First end-to-end test: publish `changesRequested` (round 2) → status flipped
+in ~10s. Publish `approved` (round 3) → nothing. The function fired but
+patched nothing: the document event arrives **before the new doc is visible
+in the query index**, so `order(round desc)[0]` returned the *older* review —
+whose decision already matched the stored status → the idempotency check
+skipped the patch permanently. No retry heals a stale-read no-op.
+
+Fix: union the firing document (`event.data`) into the decided-review set —
+the event payload is authoritative even when the index lags. Added
+`console.log` lines since invocation logs otherwise show only "started".
+Verified: round-4 publish flipped `reviewStatus` back to `approved` and the
+patch log line appears in `sanity functions logs`.
+
 ## Environment reality check
 
 This machine shipped Node 20.16; Sanity tooling needs ≥22.12 and Functions

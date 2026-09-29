@@ -6,4 +6,7 @@ export default defineCliConfig({
     entry: './src/App.tsx',
     title: 'Bureau Board',
   },
+  deployment: {
+    appId: 'iv082hu12r39wvgimogfoxhc',
+  },
 })

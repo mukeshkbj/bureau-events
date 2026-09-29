@@ -35,11 +35,20 @@ pnpm dev:editor    # http://localhost:3333 (open via Sanity Dashboard link it pr
 pnpm dev:studio    # http://localhost:3333/studio or deploy with `npx sanity deploy`
 ```
 
-Seed the launch docket:
+Seed the launch docket — either with a write token, or via `dataset import`
+which reuses your `sanity login` session (no token needed):
 
 ```sh
+# Option A: token
 SANITY_TOKEN=... pnpm seed
+
+# Option B: CLI session
+cd packages/content-model && npx tsx src/seed.ts > seed.ndjson && cd ../../apps/studio
+npx sanity dataset import ../../packages/content-model/seed.ndjson --dataset production
 ```
+
+Important: document `_id`s must not contain `.` — dotted IDs are namespaced
+and invisible to anonymous reads, which silently empties the public site.
 
 ## Content model
 
@@ -60,10 +69,11 @@ graph in one transaction.
 After `npx sanity login` and filling `.env`:
 
 ```sh
-pnpm -F @bureau/studio deploy       # Studio → <name>.sanity.studio
-pnpm -F @bureau/editor deploy      # Bureau Board → <name>.sanity.app
+pnpm -F @bureau/studio deploy       # Studio → bureau-events.sanity.studio
+pnpm -F @bureau/editor deploy      # Bureau Board → Sanity dashboard app
+npx sanity blueprints init --project-id <id> --stack-name bureau-events  # once
 npx sanity blueprints deploy       # provisions the sync-review-decision Function
-pnpm seed                          # write the launch docket
+# then seed (see above)
 ```
 
 Add the app origins (`http://localhost:3333`, `http://localhost:4321`, deployed

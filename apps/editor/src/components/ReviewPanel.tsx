@@ -55,7 +55,7 @@ export function ReviewPanel({caseHandle}: {caseHandle: DocumentHandle}) {
           decision: 'pending',
           authorNote: note,
         } as Partial<Omit<ReviewDoc, '_id' | '_type' | '_rev' | '_createdAt' | '_updatedAt'>>,
-        {documentId: `review.${caseHandle.documentId}.r${round}`},
+        {documentId: `review-${caseHandle.documentId}-r${round}`},
       )
       await apply(publishDocument(reviewHandle))
       await editCase((prev) => ({...prev, reviewStatus: 'inReview'}))
