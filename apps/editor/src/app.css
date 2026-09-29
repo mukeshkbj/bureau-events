@@ -57,6 +57,23 @@ button, input, textarea, select { font: inherit; color: inherit; }
 
 .rail-scroll { overflow-y: auto; flex: 1; }
 
+.new-docket {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  border-bottom: 1px dashed var(--amber);
+  padding: 0.7rem 1rem;
+  cursor: pointer;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  color: var(--amber);
+}
+.new-docket:hover { background: var(--panel-2); }
+.new-docket:disabled { opacity: 0.4; cursor: wait; }
+
 .case-row {
   display: block;
   width: 100%;
@@ -222,3 +239,25 @@ button, input, textarea, select { font: inherit; color: inherit; }
 }
 
 .empty-board { display: grid; place-items: center; height: 100%; color: var(--muted); font-style: italic; }
+
+.empty-graph {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  gap: 0.75rem;
+  text-align: center;
+  color: var(--muted);
+  font-style: italic;
+}
+
+.case-settings { border-color: var(--amber); padding: 0.8rem 1rem; }
+.settings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 1rem; }
+.settings-grid .span2 { grid-column: span 2; }
+
+.artifact-panel { border: 1px dashed var(--line); padding: 0.7rem; margin-bottom: 0.6rem; background: var(--panel-2); }
+
+@media (max-width: 720px) {
+  .settings-grid { grid-template-columns: 1fr; }
+  .settings-grid .span2 { grid-column: auto; }
+}

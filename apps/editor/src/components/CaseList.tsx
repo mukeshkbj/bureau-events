@@ -4,6 +4,7 @@ import {
   useDocuments,
   type DocumentHandle,
 } from '@sanity/sdk-react'
+import {NewDocketButton} from './NewDocketButton'
 
 interface CaseRow {
   title?: string
@@ -51,6 +52,7 @@ export function CaseList({
 
   return (
     <>
+      <NewDocketButton onCreated={onSelect} />
       {(data ?? []).map((handle) => (
         <Suspense key={handle.documentId} fallback={<div className="case-row">…</div>}>
           <CaseRowButton handle={handle} selected={selected?.documentId === handle.documentId} onSelect={onSelect} />

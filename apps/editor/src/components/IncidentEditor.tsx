@@ -5,10 +5,13 @@ import {
   useCreateDocument,
   useDocument,
   useEditDocument,
+  useQuery,
   type DocumentHandle,
   type SanityDocument,
 } from '@sanity/sdk-react'
 import type {GraphIncident} from '@bureau/content-model/graph'
+import {caseArtifactsQuery} from '@bureau/content-model/queries'
+import {ArtifactEditor} from './ArtifactEditor'
 
 interface Choice {
   _key?: string
@@ -17,11 +20,19 @@ interface Choice {
   next?: {_type: 'reference'; _ref: string}
 }
 
+interface ArtifactRow {
+  _id: string
+  artifactCode?: string
+  title?: string
+  kind?: string
+}
+
 type Doc = SanityDocument & {
   title?: string
   incidentCode?: string
   order?: number
   report?: string
+  evidence?: {_type: 'reference'; _ref: string}
   ending?: {isEnding?: boolean; designation?: string; epilogue?: string}
   choices?: Choice[]
 }
@@ -40,8 +51,13 @@ export function IncidentEditor({
   const {data: doc} = useDocument<Doc>({...incidentHandle})
   const edit = useEditDocument<Doc>({...incidentHandle})
   const createIncident = useCreateDocument<Doc>({documentType: 'incident'})
+  const createArtifact = useCreateDocument<SanityDocument>({documentType: 'artifact'})
   const apply = useApplyDocumentActions()
   const [endingOpen, setEndingOpen] = useState(false)
+  const {data: artifacts} = useQuery<ArtifactRow[]>({
+    query: caseArtifactsQuery,
+    params: {caseId: caseHandle.documentId},
+  })
 
   const set = (patch: Partial<Doc>) => edit((prev: Doc) => ({...prev, ...patch}))
 
@@ -72,6 +88,24 @@ export function IncidentEditor({
 
   const removeChoice = (index: number) =>
     edit((prev: Doc) => ({...prev, choices: (prev.choices ?? []).filter((_, i) => i !== index)}))
+
+  const attachArtifact = (artifactId: string) =>
+    set(artifactId ? {evidence: {_type: 'reference', _ref: artifactId}} : {evidence: undefined})
+
+  const createEvidenceArtifact = async () => {
+    const suffix = crypto.randomUUID().slice(0, 8)
+    const handle = await createArtifact(
+      {
+        title: 'Untitled artifact',
+        artifactCode: `ART-${String((artifacts?.length ?? 0) + 1).padStart(2, '0')}`,
+        kind: 'memo',
+        caseFile: {_type: 'reference', _ref: caseHandle.documentId},
+      } as Partial<Omit<SanityDocument, '_id' | '_type' | '_rev' | '_createdAt' | '_updatedAt'>>,
+      {documentId: `artifact-${suffix}`},
+    )
+    await apply(publishDocument(handle))
+    attachArtifact(handle.documentId)
+  }
 
   const createLinkedIncident = async () => {
     const handle = await createIncident({
@@ -116,6 +150,34 @@ export function IncidentEditor({
         <label>Report</label>
         <textarea value={doc?.report ?? ''} onChange={(e) => set({report: e.currentTarget.value})} />
       </div>
+
+      <div className="section-label" style={{display: 'flex', justifyContent: 'space-between'}}>
+        <span>Evidence</span>
+        {!doc?.evidence?._ref && (
+          <button className="btn small" onClick={() => void createEvidenceArtifact()}>
+            + New artifact
+          </button>
+        )}
+      </div>
+      {doc?.evidence?._ref ? (
+        <>
+          <ArtifactEditor artifactHandle={{documentId: doc.evidence._ref, documentType: 'artifact'}} />
+          <button className="btn ghost small" onClick={() => attachArtifact('')}>
+            Detach evidence
+          </button>
+        </>
+      ) : (
+        <div className="field">
+          <select value="" onChange={(e) => attachArtifact(e.currentTarget.value)}>
+            <option value="">— attach an existing artifact —</option>
+            {(artifacts ?? []).map((a) => (
+              <option key={a._id} value={a._id}>
+                {a.artifactCode ?? '???'} — {a.title ?? 'Untitled'}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
 
       <div className="section-label">Ending</div>
       <div className="field">

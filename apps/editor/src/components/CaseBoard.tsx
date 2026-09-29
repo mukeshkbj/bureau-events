@@ -1,7 +1,16 @@
 import {useMemo, useState} from 'react'
-import {useDocumentProjection, useQuery, type DocumentHandle} from '@sanity/sdk-react'
+import {
+  publishDocument,
+  useApplyDocumentActions,
+  useCreateDocument,
+  useDocumentProjection,
+  useQuery,
+  type DocumentHandle,
+  type SanityDocument,
+} from '@sanity/sdk-react'
 import {caseBoardQuery} from '@bureau/content-model/queries'
 import {computeLayers, diagnoseCase, type GraphIncident} from '@bureau/content-model/graph'
+import {CaseSettings} from './CaseSettings'
 import {IncidentEditor} from './IncidentEditor'
 import {ReviewPanel} from './ReviewPanel'
 
@@ -49,6 +58,9 @@ function layout(incidents: BoardIncident[]): Map<string, Position> {
 export function CaseBoard({caseHandle}: {caseHandle: DocumentHandle}) {
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [showReviews, setShowReviews] = useState(false)
+  const [showSettings, setShowSettings] = useState(false)
+  const createIncident = useCreateDocument<SanityDocument>({documentType: 'incident'})
+  const apply = useApplyDocumentActions()
 
   const {data: caseData} = useDocumentProjection<{title?: string; docketNumber?: string; reviewStatus?: string}>({
     ...caseHandle,
@@ -96,6 +108,21 @@ export function CaseBoard({caseHandle}: {caseHandle: DocumentHandle}) {
     }
   }
 
+  const addIncident = async () => {
+    const nextOrder = nodes.length === 0 ? 0 : Math.max(...nodes.map((n) => n.order ?? 0)) + 1
+    const handle = await createIncident(
+      {
+        title: 'Untitled incident',
+        incidentCode: `INC-${String(nodes.length + 1).padStart(2, '0')}`,
+        caseFile: {_type: 'reference', _ref: caseHandle.documentId},
+        order: nextOrder,
+      } as Partial<Omit<SanityDocument, '_id' | '_type' | '_rev' | '_createdAt' | '_updatedAt'>>,
+      {documentId: `incident-${crypto.randomUUID().slice(0, 8)}`},
+    )
+    await apply(publishDocument(handle))
+    setSelectedId(handle.documentId)
+  }
+
   return (
     <div className="canvas">
       <div className="canvas-head">
@@ -108,11 +135,20 @@ export function CaseBoard({caseHandle}: {caseHandle: DocumentHandle}) {
             <span className={`status-pill ${caseData?.reviewStatus ?? ''}`}>{caseData?.reviewStatus ?? 'draft'}</span>
           </div>
         </div>
-        <button className="btn" onClick={() => setShowReviews((v) => !v)}>
-          {showReviews ? 'Hide reviews' : 'Reviews'}
-        </button>
+        <div style={{display: 'flex', gap: '0.4rem'}}>
+          <button className="btn" onClick={() => void addIncident()}>
+            + Incident
+          </button>
+          <button className="btn ghost" onClick={() => setShowSettings((v) => !v)}>
+            {showSettings ? 'Hide details' : 'Docket details'}
+          </button>
+          <button className="btn ghost" onClick={() => setShowReviews((v) => !v)}>
+            {showReviews ? 'Hide reviews' : 'Reviews'}
+          </button>
+        </div>
       </div>
 
+      {showSettings && <CaseSettings caseHandle={caseHandle} />}
       {showReviews && <ReviewPanel caseHandle={caseHandle} />}
 
       <div className="board-grid" style={{width: canvasW, height: canvasH}}>
@@ -121,6 +157,14 @@ export function CaseBoard({caseHandle}: {caseHandle: DocumentHandle}) {
             <path key={e.key} d={e.d} className={e.on ? 'on' : ''} />
           ))}
         </svg>
+        {nodes.length === 0 && (
+          <div className="empty-graph">
+            <p>No incidents on file for this docket.</p>
+            <button className="btn" onClick={() => void addIncident()}>
+              + Add the entry incident
+            </button>
+          </div>
+        )}
         {nodes.map((inc) => {
           const pos = positions.get(inc._id)
           if (!pos) return null
