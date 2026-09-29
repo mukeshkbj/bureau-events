@@ -27,9 +27,13 @@ a *graph of documents*, so the editorial tool is a **live investigation board**
 — nodes pinned to a desk, edges drawn between them, diagnostics stamped on
 broken graphs, all updating in real time over the Sanity App SDK.
 
-<!-- SCREENSHOT: public index — the card-catalog of dockets -->
-<!-- SCREENSHOT: case reader mid-branch — report + choices + route trail -->
-<!-- SCREENSHOT: ending state — the stamp slamming down -->
+![The docket index — every case filed as a card-catalog entry](screenshots/index.png)
+
+![A dossier: classification strip, premise, and the bureau sigil](screenshots/reader-entry.png)
+
+![An incident mid-branch — drop cap, taped-on evidence card, route trail](screenshots/reader-evidence.png)
+
+![A path terminated — the ANOMALY designation stamped down](screenshots/reader-ending.png)
 
 ## The schema is the product
 
@@ -51,6 +55,8 @@ projection: one query returns the docket plus every incident with its resolved
 choices (`choices[]{ "nextId": next._ref }`), ending, and dereferenced
 evidence. The frontend walks it as a pure client-side graph traversal with
 `#i=<incident-id>` deep links.
+
+![System map — editors, board, lake, function, archive](diagrams/bureau-architecture.visual-check.1440x900.light.png)
 
 ## Past the Studio: the Bureau Board (App SDK)
 
@@ -79,8 +85,8 @@ persistence, real-time. The Studio keeps its own job: schema validation plus
 two custom document actions, **Submit for review** and **Publish case graph**
 (the latter publishes the docket and every child draft in one transaction).
 
-<!-- SCREENSHOT: Bureau Board — graph canvas with nodes + edges + diagnostics -->
-<!-- SCREENSHOT: incident drawer editor -->
+<!-- TODO screenshot: Bureau Board graph canvas (needs Sanity dashboard session — capture from https://www.sanity.io/@o041d79wc/application/iv082hu12r39wvgimogfoxhc) -->
+<!-- TODO screenshot: incident drawer editor open on a node -->
 
 ## Workflows: review as data, a Function as the messenger
 
@@ -99,7 +105,7 @@ The challenge asked to see a process modeled next to the content. Here it is:
 
 Round-tripping works: request changes → author resubmits round N+1 → approved.
 
-<!-- SCREENSHOT or clip: review panel approving, then status pill flipping -->
+<!-- TODO screenshot or short clip: review panel — approve a round, then the status pill flipping (function runs in ~10s) -->
 
 ## The build story (the honest part)
 
@@ -138,4 +144,4 @@ Blueprints · Cloudflare Pages · pnpm monorepo with a shared
 - Repo README has setup, seeding (token or CLI-session import), deploy steps,
   and the docket-authoring walkthrough.
 
-<!-- VIDEO/GIF: 60–90s — file a docket, add two incidents, submit review, approve, see status flip, reload public index -->
+<!-- OPTIONAL video/gif, 60–90s: file a docket → add incidents → submit review → approve → status flips → reload public index -->
