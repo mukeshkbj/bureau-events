@@ -146,7 +146,7 @@ Blueprints · Cloudflare Pages · pnpm monorepo with a shared
 
 - **Read the archive** — https://bureau-events.pages.dev — no login needed; take a path to an ending.
 - **The editorial surfaces** (Bureau Board app + Studio) are gated by Sanity org
-  membership — the Board link is above, and the screenshots, walkthrough video,
+  membership — the Board link is above, and the screenshots, walkthrough videos,
   and the repo's README show the full authoring loop end to end.
 - **Judges** — Sanity project ID `9n512feo`, public dataset `production`:
   `https://9n512feo.api.sanity.io/v2026-09-01/data/query/production?query=*%5B_type%20%3D%3D%20%22caseFile%22%5D`
@@ -158,4 +158,9 @@ Demo walkthrough — index → dossier → choices → evidence → ending (62s,
 
 https://github.com/mukeshkbj/bureau-events/blob/master/docs/media/archive-walkthrough.webm
 
-<!-- OPTIONAL second clip if you want the editorial side too: file a docket → add incidents → submit review → approve → status flips (needs a logged-in Sanity session — capture on your screen, e.g. Win+Alt+R) -->
+Editorial round-trip — Bureau Board files docket BAH-0007, submits it for
+review, a curator approves, and the `sync-review-decision` Function lands the
+`APPROVED` decision on the review trail — live, unedited (46s,
+`docs/media/editorial-review-roundtrip.webm`):
+
+https://github.com/mukeshkbj/bureau-events/blob/master/docs/media/editorial-review-roundtrip.webm

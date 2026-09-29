@@ -2,6 +2,7 @@
 interface ImportMetaEnv {
   readonly SANITY_APP_PROJECT_ID?: string
   readonly SANITY_APP_DATASET?: string
+  readonly SANITY_APP_TOKEN?: string
 }
 
 interface ImportMeta {

@@ -4,10 +4,13 @@ import {Suspense} from 'react'
 import {BureauBoard} from './components/BureauBoard'
 import './app.css'
 
+const token = import.meta.env.SANITY_APP_TOKEN
+
 const config: SanityConfig[] = [
   {
     projectId: import.meta.env.SANITY_APP_PROJECT_ID ?? 'MISSING_PROJECT_ID',
     dataset: import.meta.env.SANITY_APP_DATASET ?? 'production',
+    ...(token ? {auth: {token}} : {}),
   },
 ]
 
