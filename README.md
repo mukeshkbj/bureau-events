@@ -136,5 +136,8 @@ Add the app origins (`http://localhost:3333`, `http://localhost:4321`, deployed
 hosts) under **API → CORS** in the project settings so the App SDK app can
 authenticate.
 
-The static site is pre-rendered: rebuild `apps/web` on publish (webhook →
-deploy hook) to pick up newly approved dockets.
+The static site is pre-rendered. A Sanity webhook fires on any published
+change to `caseFile`/`incident`/`artifact`/`review`, dispatches
+`repository_dispatch` to GitHub, and `.github/workflows/rebuild-on-sanity.yml`
+rebuilds `apps/web` and deploys to Cloudflare Pages. Manual fallback:
+`npx wrangler pages deploy apps/web/dist --project-name bureau-events`.
