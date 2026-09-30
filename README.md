@@ -6,6 +6,8 @@ Editors work in a custom real-time board (App SDK) rather than the Studio form.
 
 DEV × Sanity Challenge — Path Two submission.
 
+**DEV post:** https://dev.to/mukeshkbj/bureau-of-almost-happened-events-a-counterfactual-archive-on-a-document-graph-2dc1
+
 ## How it works, end to end
 
 The story is a document graph. A `caseFile` is a docket; each `incident` is a

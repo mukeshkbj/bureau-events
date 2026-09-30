@@ -6,6 +6,8 @@ tags: sanitychallenge, webdev, astro, showdev
 
 # Bureau of Almost-Happened Events
 
+**Published:** https://dev.to/mukeshkbj/bureau-of-almost-happened-events-a-counterfactual-archive-on-a-document-graph-2dc1
+
 *A counterfactual story archive where every docket is a branching document graph — and the editors build that graph on a live investigation board instead of a CMS form.*
 
 ## Links
